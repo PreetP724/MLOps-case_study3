@@ -23,8 +23,7 @@ services:
     image: preetp724/app_frontend:latest
     container_name: app_frontend
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     ports:
       - '22075:22075'
     expose:
@@ -46,7 +45,7 @@ services:
     - "22078:4040"
     networks:
       - app_net
-    restart: unless-stopped
+    #restart: unless-stopped
   
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -59,7 +58,7 @@ services:
       - /dev/disk:/dev/disk:ro
     networks:
       - app_net
-    restart: unless-stopped
+    #restart: unless-stopped
 
   node-exporter:
     image: quay.io/prometheus/node-exporter:latest
@@ -74,7 +73,7 @@ services:
     pid: host
     networks:
       - app_net
-    restart: unless-stopped
+    #restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
@@ -93,7 +92,7 @@ services:
       - cadvisor
     networks:
       - app_net
-    restart: unless-stopped
+    #restart: unless-stopped
   
   
   grafana:
@@ -107,7 +106,7 @@ services:
       - prometheus
     networks:
       - app_net
-    restart: unless-stopped
+    #restart: unless-stopped
 
 networks:
   app_net:
