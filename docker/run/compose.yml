@@ -7,6 +7,8 @@ services:
       - '9090'
     networks:
       - app_net
+    env_file:
+      - .env
     environment:
     - HF_TOKEN=${HF_TOKEN}
     healthcheck:
@@ -36,6 +38,8 @@ services:
     depends_on:
       - frontend
     command: http frontend:22075
+    env_file:
+      - .env
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
     ports:
