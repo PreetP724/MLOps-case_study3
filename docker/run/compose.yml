@@ -1,0 +1,116 @@
+services:
+  backend:
+    image: preetp724/app_backend:latest
+    container_name: app_backend
+    expose:
+      - '22076'
+      - '9090'
+    networks:
+      - app_net
+    environment:
+    - HF_TOKEN=${HF_TOKEN}
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:22076/health']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    
+
+  frontend:
+    image: preetp724/app_frontend:latest
+    container_name: app_frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - '22075:22075'
+    expose:
+      - '9090'
+    networks:
+      - app_net
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    depends_on:
+      - frontend
+    command: http frontend:22075
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    ports:
+    - "22003:4040"
+    networks:
+      - app_net
+    restart: unless-stopped
+  
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - app_net
+    restart: unless-stopped
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - --path.rootfs=/host
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    volumes:
+      - /:/host:ro
+    pid: host
+    networks:
+      - app_net
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - '22004:9090'
+    depends_on:
+      - frontend
+      - backend
+      - node-exporter
+      - cadvisor
+    networks:
+      - app_net
+    restart: unless-stopped
+  
+  
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "22005:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - app_net
+    restart: unless-stopped
+
+networks:
+  app_net:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
