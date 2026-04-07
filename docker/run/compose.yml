@@ -39,7 +39,7 @@ services:
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
     ports:
-    - "22003:4040"
+    - "22078:4040"
     networks:
       - app_net
     restart: unless-stopped
@@ -81,7 +81,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     ports:
-      - '22004:9090'
+      - '22077:9090'
     depends_on:
       - frontend
       - backend
@@ -96,7 +96,7 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
-      - "22005:3000"
+      - "22079:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
