@@ -3,20 +3,6 @@ from typing import Optional
 import prometheus_client
 
 
-
-CHAT_REQUESTS_TOTAL = prometheus_client.Counter(
-    'backend_recipe_requests_total',
-    'Total number of /recipe requests received by the backend.'
-)
-CHAT_REQUEST_ERRORS_TOTAL = prometheus_client.Counter(
-    'backend_recipe_request_errors_total',
-    'Total number of failed /recipe requests handled by the backend.'
-)
-CHAT_REQUEST_DURATION_SECONDS = prometheus_client.Histogram(
-    'backend_recipe_request_duration_seconds',
-    'Time spent generating recipe responses in the backend.'
-)
-
 pipe = None
 stop_inference = False
 tokenizer = None
