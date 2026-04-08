@@ -2,9 +2,8 @@ services:
   backend:
     image: preetp724/app_backend:latest
     container_name: app_backend
-    expose:
-      - '22076'
-      - '9090'
+    ports:
+      - '22076:22076'
     networks:
       - app_net
     env_file:
@@ -18,7 +17,6 @@ services:
       retries: 10
       start_period: 30s
     
-
   frontend:
     image: preetp724/app_frontend:latest
     container_name: app_frontend
@@ -26,8 +24,6 @@ services:
       - backend
     ports:
       - '22075:22075'
-    expose:
-      - '9090'
     networks:
       - app_net
 
@@ -47,19 +43,6 @@ services:
       - app_net
     #restart: unless-stopped
   
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /dev/disk:/dev/disk:ro
-    networks:
-      - app_net
-    #restart: unless-stopped
-
   node-exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
@@ -89,21 +72,6 @@ services:
       - frontend
       - backend
       - node-exporter
-      - cadvisor
-    networks:
-      - app_net
-    #restart: unless-stopped
-  
-  
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana07
-    ports:
-      - "22079:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-    depends_on:
-      - prometheus
     networks:
       - app_net
     #restart: unless-stopped
@@ -114,6 +82,4 @@ networks:
 
 volumes:
   prometheus_data:
-    driver: local
-  grafana_data:
     driver: local

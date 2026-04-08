@@ -11,14 +11,9 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ['app_backend:22076']
-      
-  - job_name: 'cadvisor'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['cadvisor:8080']
 
   - job_name: 'node-exporter'
     metrics_path: /metrics
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ['node_exporter:9100']
 
